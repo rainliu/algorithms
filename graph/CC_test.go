@@ -19,9 +19,9 @@ func TestCC(t *testing.T) {
 	G := NewGraphFromReader(fd)
 
 	var c CC
-	c = NewCC(G)
+	c = NewDFS(G, 0)
 
-	M := c.CC()
+	M := c.Count()
 	fmt.Printf("%d components\n", M)
 
 	components := make([]*container.Bag, M)

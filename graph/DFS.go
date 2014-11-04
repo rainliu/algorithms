@@ -5,17 +5,12 @@ import (
 )
 
 type DFS struct {
-	//Search interface
 	marked []bool
-	count  int
-
-	//Paths interface
 	edgeTo []int
-	s      int
+	id     []int
+	cc     int
 
-	//CC interface
-	id []int
-	cc int
+	s int
 }
 
 func NewDFS(G *Graph, s int) *DFS {
@@ -24,24 +19,12 @@ func NewDFS(G *Graph, s int) *DFS {
 	this.marked = make([]bool, G.V())
 	this.edgeTo = make([]int, G.V())
 	this.id = make([]int, G.V())
-
 	this.s = s
+	this.cc = 0
 
-	this.explore(G, s)
-
-	return this
-}
-
-func NewCC(G *Graph) *DFS {
-	this := &DFS{}
-
-	this.marked = make([]bool, G.V())
-	this.edgeTo = make([]int, G.V())
-	this.id = make([]int, G.V())
-
-	for s := 0; s < G.V(); s++ {
-		if !this.marked[s] {
-			this.explore(G, s)
+	for v := 0; v < G.V(); v++ {
+		if !this.marked[v] {
+			this.explore(G, v)
 			this.cc++
 		}
 	}
@@ -65,7 +48,6 @@ func (this *DFS) explore(G *Graph, v int) {
 }
 
 func (this *DFS) previsit(v int) {
-	this.count++
 	this.id[v] = this.cc
 }
 
@@ -73,18 +55,13 @@ func (this *DFS) postvisit(v int) {
 
 }
 
-//Search interface
 func (this *DFS) Marked(v int) bool {
-	return this.marked[v]
-}
-
-func (this *DFS) Count() int {
-	return this.count
+	return this.Connected(v, this.s)
 }
 
 //Paths interface
 func (this *DFS) HasPathTo(v int) bool {
-	return this.marked[v]
+	return this.Connected(v, this.s)
 }
 
 func (this *DFS) PathTo(v int) container.Iterable {
@@ -101,7 +78,7 @@ func (this *DFS) PathTo(v int) container.Iterable {
 }
 
 //CC interface
-func (this *DFS) CC() int {
+func (this *DFS) Count() int {
 	return this.cc
 }
 

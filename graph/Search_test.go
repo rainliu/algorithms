@@ -26,7 +26,7 @@ func TestSearch(t *testing.T) {
 		}
 	}
 	fmt.Printf("\n")
-	if s.Count() != G.V() {
+	if s.Count() != 1 {
 		fmt.Printf("NOT ")
 	}
 	fmt.Printf("connected\n")
@@ -38,7 +38,7 @@ func TestSearch(t *testing.T) {
 		}
 	}
 	fmt.Printf("\n")
-	if s.Count() != G.V() {
+	if s.Count() != 1 {
 		fmt.Printf("NOT ")
 	}
 	fmt.Printf("connected\n")

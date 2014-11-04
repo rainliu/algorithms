@@ -3,7 +3,7 @@ package graph
 import ()
 
 type CC interface {
-	CC() int
+	Count() int
 	Connected(v, w int) bool
 	ID(v int) int
 }

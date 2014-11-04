@@ -11,10 +11,18 @@ type DFS struct {
 	cc     int
 
 	s int
+
+	pre   []int
+	post  []int
+	clock int
 }
 
 func NewDFS(G *Graph, s int) *DFS {
 	this := &DFS{}
+
+	this.pre = make([]int, G.V())
+	this.post = make([]int, G.V())
+	this.clock = 0
 
 	this.marked = make([]bool, G.V())
 	this.edgeTo = make([]int, G.V())
@@ -49,14 +57,21 @@ func (this *DFS) explore(G *Graph, v int) {
 
 func (this *DFS) previsit(v int) {
 	this.id[v] = this.cc
+	this.pre[v] = this.clock
+	this.clock++
 }
 
 func (this *DFS) postvisit(v int) {
-
+	this.post[v] = this.clock
+	this.clock++
 }
 
-func (this *DFS) Marked(v int) bool {
-	return this.Connected(v, this.s)
+func (this *DFS) Pre(v int) int {
+	return this.pre[v]
+}
+
+func (this *DFS) Post(v int) int {
+	return this.post[v]
 }
 
 //Paths interface
@@ -77,11 +92,17 @@ func (this *DFS) PathTo(v int) container.Iterable {
 	return path
 }
 
-//CC interface
+//Search interface
+func (this *DFS) Marked(v int) bool {
+	return this.Connected(v, this.s)
+}
+
+//Search and CC interface
 func (this *DFS) Count() int {
 	return this.cc
 }
 
+//CC interface
 func (this *DFS) Connected(v, w int) bool {
 	return this.id[v] == this.id[w]
 }

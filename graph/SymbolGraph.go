@@ -12,7 +12,7 @@ type SymbolGraph struct {
 	st   map[string]int
 }
 
-func NewSymbolGraph(r io.Reader, delim string) *SymbolGraph {
+func NewSymbolGraph(r io.ReadSeeker, delim string) *SymbolGraph {
 	this := &SymbolGraph{}
 	this.st = make(map[string]int)
 
@@ -34,6 +34,7 @@ func NewSymbolGraph(r io.Reader, delim string) *SymbolGraph {
 
 	this.g = NewGraph(len(this.st))
 
+	r.Seek(0, 0)
 	scanner2 := bufio.NewScanner(r)
 	scanner2.Split(bufio.ScanLines)
 	for scanner2.Scan() {

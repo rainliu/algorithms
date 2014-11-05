@@ -13,7 +13,7 @@ func TestGraph(t *testing.T) {
 	}
 	defer fd.Close()
 
-	g := NewGraphFromReader(fd)
+	g := NewUnigraphFromReader(fd)
 
 	fmt.Printf(g.String())
 }

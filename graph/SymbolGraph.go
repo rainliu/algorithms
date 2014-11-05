@@ -32,7 +32,7 @@ func NewSymbolGraph(r io.ReadSeeker, delim string) *SymbolGraph {
 		this.keys[this.st[name]] = name
 	}
 
-	this.g = NewGraph(len(this.st))
+	this.g = NewUnigraph(len(this.st))
 
 	r.Seek(0, 0)
 	scanner2 := bufio.NewScanner(r)

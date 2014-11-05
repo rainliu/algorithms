@@ -14,7 +14,7 @@ type Graph struct {
 	adj     []*container.Bag
 }
 
-func NewGraph(v int) *Graph {
+func NewUnigraph(v int) *Graph {
 	this := &Graph{}
 	this.digraph = false
 	this.v = v
@@ -38,15 +38,15 @@ func NewDigraph(v int) *Graph {
 	return this
 }
 
-func NewGraphFromReader(r io.Reader) *Graph {
-	return newGraphDigraphFromReader(r, false)
+func NewUnigraphFromReader(r io.Reader) *Graph {
+	return NewGraphFromReader(r, false)
 }
 
 func NewDigraphFromReader(r io.Reader) *Graph {
-	return newGraphDigraphFromReader(r, true)
+	return NewGraphFromReader(r, true)
 }
 
-func newGraphDigraphFromReader(r io.Reader, digraph bool) *Graph {
+func NewGraphFromReader(r io.Reader, digraph bool) *Graph {
 	var v, e, w int
 	var err error
 	var this *Graph
@@ -62,7 +62,7 @@ func newGraphDigraphFromReader(r io.Reader, digraph bool) *Graph {
 	if digraph {
 		this = NewDigraph(v)
 	} else {
-		this = NewGraph(v)
+		this = NewUnigraph(v)
 	}
 
 	scanner.Scan()

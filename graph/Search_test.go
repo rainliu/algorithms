@@ -15,7 +15,7 @@ func TestSearch(t *testing.T) {
 	}
 	defer fd.Close()
 
-	G := NewGraphFromReader(fd)
+	G := NewUnigraphFromReader(fd)
 
 	var s Search
 

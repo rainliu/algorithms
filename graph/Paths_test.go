@@ -15,7 +15,7 @@ func TestPaths(t *testing.T) {
 	}
 	defer fd.Close()
 
-	G := NewGraphFromReader(fd)
+	G := NewUnigraphFromReader(fd)
 	s := 0
 	var p Paths
 

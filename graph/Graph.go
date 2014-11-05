@@ -8,13 +8,27 @@ import (
 )
 
 type Graph struct {
-	v   int
-	e   int
-	adj []*container.Bag
+	digraph bool
+	v       int
+	e       int
+	adj     []*container.Bag
 }
 
 func NewGraph(v int) *Graph {
 	this := &Graph{}
+	this.digraph = false
+	this.v = v
+	this.e = 0
+	this.adj = make([]*container.Bag, v)
+	for i := 0; i < v; i++ {
+		this.adj[i] = &container.Bag{}
+	}
+	return this
+}
+
+func NewDigraph(v int) *Graph {
+	this := &Graph{}
+	this.digraph = true
 	this.v = v
 	this.e = 0
 	this.adj = make([]*container.Bag, v)
@@ -25,8 +39,17 @@ func NewGraph(v int) *Graph {
 }
 
 func NewGraphFromReader(r io.Reader) *Graph {
+	return newGraphDigraphFromReader(r, false)
+}
+
+func NewDigraphFromReader(r io.Reader) *Graph {
+	return newGraphDigraphFromReader(r, true)
+}
+
+func newGraphDigraphFromReader(r io.Reader, digraph bool) *Graph {
 	var v, e, w int
 	var err error
+	var this *Graph
 
 	scanner := bufio.NewScanner(r)
 	scanner.Split(bufio.ScanWords)
@@ -36,7 +59,11 @@ func NewGraphFromReader(r io.Reader) *Graph {
 		return nil
 	}
 
-	this := NewGraph(v)
+	if digraph {
+		this = NewDigraph(v)
+	} else {
+		this = NewGraph(v)
+	}
 
 	scanner.Scan()
 	if e, err = strconv.Atoi(scanner.Text()); err != nil {
@@ -67,8 +94,30 @@ func (this *Graph) E() int {
 
 func (this *Graph) AddEdge(v, w int) {
 	this.adj[v].Push(w)
-	this.adj[w].Push(v)
+	if !this.digraph {
+		this.adj[w].Push(v)
+	}
 	this.e++
+}
+
+func (this *Graph) IsDigraph() bool {
+	return this.digraph
+}
+
+func (this *Graph) Reverse() *Graph {
+	if this.digraph {
+		R := NewDigraph(this.v)
+		for v := 0; v < this.v; v++ {
+			iter := this.Adj(v).Iterator()
+			for iter.HasNext() {
+				w := iter.Next().Value.(int)
+				R.AddEdge(w, v)
+			}
+		}
+		return R
+	} else {
+		return nil
+	}
 }
 
 func (this *Graph) Adj(v int) container.Iterable {

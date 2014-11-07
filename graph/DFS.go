@@ -4,79 +4,80 @@ import (
 	"algorithms/container"
 )
 
+//Depth First Search
 type DFS struct {
 	marked []bool
 	edgeTo []int
 	id     []int
-	cc     int
+
+	digraph bool
+	count   int
 
 	s int
-
-	pre   []int
-	post  []int
-	clock int
 }
 
 func NewDFS(G *Graph, s int) *DFS {
 	this := &DFS{}
 
-	this.pre = make([]int, G.V())
-	this.post = make([]int, G.V())
-	this.clock = 0
-
 	this.marked = make([]bool, G.V())
 	this.edgeTo = make([]int, G.V())
 	this.id = make([]int, G.V())
 	this.s = s
-	this.cc = 0
 
-	for v := 0; v < G.V(); v++ {
-		if !this.marked[v] {
-			this.explore(G, v)
-			this.cc++
+	this.digraph = G.IsDigraph()
+	this.count = 0
+
+	if this.digraph {
+		dfo := NewDFO(G.Reverse())
+
+		iter := dfo.ReversePost().Iterator()
+		for iter.HasNext() {
+			v := iter.Next().Value.(int)
+			if !this.marked[v] {
+				this.explore(G, v, true)
+				this.count++
+			}
+		}
+
+		//reset marked slice
+		this.marked = make([]bool, G.V())
+		this.explore(G, s, false)
+	} else {
+		for v := 0; v < G.V(); v++ {
+			if !this.marked[v] {
+				this.explore(G, v, true)
+				this.count++
+			}
 		}
 	}
-
 	return this
 }
 
-func (this *DFS) explore(G *Graph, v int) {
+func (this *DFS) explore(G *Graph, v int, cc bool) {
+	if cc {
+		this.id[v] = this.count
+	}
 	this.marked[v] = true
 
-	this.previsit(v)
 	iter := G.Adj(v).Iterator()
 	for iter.HasNext() {
 		w := iter.Next().Value.(int)
 		if !this.marked[w] {
-			this.edgeTo[w] = v
-			this.explore(G, w)
+			if !cc {
+				this.edgeTo[w] = v
+			}
+			this.explore(G, w, cc)
 		}
 	}
-	this.postvisit(v)
-}
-
-func (this *DFS) previsit(v int) {
-	this.id[v] = this.cc
-	this.pre[v] = this.clock
-	this.clock++
-}
-
-func (this *DFS) postvisit(v int) {
-	this.post[v] = this.clock
-	this.clock++
-}
-
-func (this *DFS) Pre(v int) int {
-	return this.pre[v]
-}
-
-func (this *DFS) Post(v int) int {
-	return this.post[v]
 }
 
 //Paths interface
 func (this *DFS) HasPathTo(v int) bool {
-	return this.Connected(v, this.s)
+	if this.digraph {
+		return this.marked[v]
+	} else {
+		return this.Connected(v, this.s)
+	}
 }
 
 func (this *DFS) PathTo(v int) container.Iterable {
@@ -92,17 +93,12 @@ func (this *DFS) PathTo(v int) container.Iterable {
 	return path
 }
 
-//Search interface
-func (this *DFS) Marked(v int) bool {
-	return this.Connected(v, this.s)
-}
-
-//Search and CC interface
+//SC/SCC interface
 func (this *DFS) Count() int {
-	return this.cc
+	return this.count
 }
 
-//CC interface
+//CC/SCC interface
 func (this *DFS) Connected(v, w int) bool {
 	return this.id[v] == this.id[w]
 }

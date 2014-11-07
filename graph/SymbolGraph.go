@@ -12,7 +12,7 @@ type SymbolGraph struct {
 	st   map[string]int
 }
 
-func NewSymbolGraph(r io.ReadSeeker, delim string) *SymbolGraph {
+func NewSymbolGraph(r io.ReadSeeker, digraph bool, delim string) *SymbolGraph {
 	this := &SymbolGraph{}
 	this.st = make(map[string]int)
 
@@ -32,7 +32,7 @@ func NewSymbolGraph(r io.ReadSeeker, delim string) *SymbolGraph {
 		this.keys[this.st[name]] = name
 	}
 
-	this.g = NewUnigraph(len(this.st))
+	this.g = NewGraph(len(this.st), digraph)
 
 	r.Seek(0, 0)
 	scanner2 := bufio.NewScanner(r)

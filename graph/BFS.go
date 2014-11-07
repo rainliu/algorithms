@@ -4,6 +4,7 @@ import (
 	"algorithms/container"
 )
 
+//Breadth First Search
 type BFS struct {
 	marked []bool
 	edgeTo []int

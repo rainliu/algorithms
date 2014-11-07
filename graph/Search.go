@@ -3,6 +3,6 @@ package graph
 import ()
 
 type Search interface {
-	Marked(v int) bool
+	HasPathTo(v int) bool
 	Count() int
 }

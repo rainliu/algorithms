@@ -21,7 +21,7 @@ func CallSymbolGraph(filename, command, delim string) {
 	}
 	defer fd.Close()
 
-	sg := NewSymbolGraph(fd, delim)
+	sg := NewSymbolGraph(fd, false, delim)
 	g := sg.G()
 	//fmt.Printf("%s\n", g.String())
 
@@ -57,7 +57,7 @@ func CallDegreeOfSeparation(filename, command, delim, source string) {
 	}
 	defer fd.Close()
 
-	sg := NewSymbolGraph(fd, delim)
+	sg := NewSymbolGraph(fd, false, delim)
 	g := sg.G()
 	//fmt.Printf("%s\n", g.String())
 

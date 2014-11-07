@@ -15,27 +15,11 @@ type Graph struct {
 }
 
 func NewUnigraph(v int) *Graph {
-	this := &Graph{}
-	this.digraph = false
-	this.v = v
-	this.e = 0
-	this.adj = make([]*container.Bag, v)
-	for i := 0; i < v; i++ {
-		this.adj[i] = &container.Bag{}
-	}
-	return this
+	return NewGraph(v, false)
 }
 
 func NewDigraph(v int) *Graph {
-	this := &Graph{}
-	this.digraph = true
-	this.v = v
-	this.e = 0
-	this.adj = make([]*container.Bag, v)
-	for i := 0; i < v; i++ {
-		this.adj[i] = &container.Bag{}
-	}
-	return this
+	return NewGraph(v, true)
 }
 
 func NewUnigraphFromReader(r io.Reader) *Graph {
@@ -44,6 +28,18 @@ func NewUnigraphFromReader(r io.Reader) *Graph {
 
 func NewDigraphFromReader(r io.Reader) *Graph {
 	return NewGraphFromReader(r, true)
+}
+
+func NewGraph(v int, digraph bool) *Graph {
+	this := &Graph{}
+	this.digraph = digraph
+	this.v = v
+	this.e = 0
+	this.adj = make([]*container.Bag, v)
+	for i := 0; i < v; i++ {
+		this.adj[i] = &container.Bag{}
+	}
+	return this
 }
 
 func NewGraphFromReader(r io.Reader, digraph bool) *Graph {

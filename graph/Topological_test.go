@@ -9,7 +9,7 @@ import (
 )
 
 func TestTopological(t *testing.T) {
-	fd, err := os.Open("jobs.txt")
+	fd, err := os.Open("../data/jobs.txt")
 	if err != nil {
 		panic(fmt.Sprintf("open %s: %v", "jobs.txt", err))
 	}

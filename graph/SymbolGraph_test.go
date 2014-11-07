@@ -10,8 +10,8 @@ import (
 )
 
 func TestSymbolGraph(t *testing.T) {
-	CallSymbolGraph("routes.txt", "routes_cmd.txt", " ")
-	CallSymbolGraph("movies.txt", "movies_cmd.txt", "/")
+	CallSymbolGraph("../data/routes.txt", "../data/routes_cmd.txt", " ")
+	CallSymbolGraph("../data/movies.txt", "../data/movies_cmd.txt", "/")
 }
 
 func CallSymbolGraph(filename, command, delim string) {
@@ -47,7 +47,7 @@ func CallSymbolGraph(filename, command, delim string) {
 }
 
 func TestDegreeOfSeparation(t *testing.T) {
-	CallDegreeOfSeparation("routes.txt", "routes_cmd.txt", " ", "JFK")
+	CallDegreeOfSeparation("../data/routes.txt", "../data/routes_cmd.txt", " ", "JFK")
 }
 
 func CallDegreeOfSeparation(filename, command, delim, source string) {

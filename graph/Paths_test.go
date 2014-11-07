@@ -9,7 +9,7 @@ import (
 )
 
 func TestPaths(t *testing.T) {
-	fd, err := os.Open("tinyCG.txt")
+	fd, err := os.Open("../data/tinyCG.txt")
 	if err != nil {
 		panic(fmt.Sprintf("open %s: %v", "tinyCG.txt", err))
 	}

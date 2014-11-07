@@ -7,7 +7,7 @@ import (
 )
 
 func TestUnigraph(t *testing.T) {
-	fd, err := os.Open("tinyG.txt")
+	fd, err := os.Open("../data/tinyG.txt")
 	if err != nil {
 		panic(fmt.Sprintf("open %s: %v", "tinyG.txt", err))
 	}
@@ -19,7 +19,7 @@ func TestUnigraph(t *testing.T) {
 }
 
 func TestDigraph(t *testing.T) {
-	fd, err := os.Open("tinyDG.txt")
+	fd, err := os.Open("../data/tinyDG.txt")
 	if err != nil {
 		panic(fmt.Sprintf("open %s: %v", "tinyDG.txt", err))
 	}

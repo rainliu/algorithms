@@ -9,7 +9,7 @@ type PriorityQueueItem struct {
 	Key   algorithms.Comparable
 }
 
-type priority_queue struct {
+type PriorityQueue struct {
 	max_pq  bool
 	current int
 	size    int
@@ -18,16 +18,16 @@ type priority_queue struct {
 	keys    []algorithms.Comparable
 }
 
-func NewMaxPriorityQueue(size int) *priority_queue {
+func NewMaxPriorityQueue(size int) *PriorityQueue {
 	return NewPriorityQueue(size, true)
 }
 
-func NewMinPriorityQueue(size int) *priority_queue {
+func NewMinPriorityQueue(size int) *PriorityQueue {
 	return NewPriorityQueue(size, false)
 }
 
-func NewPriorityQueue(size int, max_pq bool) *priority_queue {
-	this := &priority_queue{}
+func NewPriorityQueue(size int, max_pq bool) *PriorityQueue {
+	this := &PriorityQueue{}
 
 	this.pq = make([]int, size+1)
 	this.qp = make([]int, size+1)
@@ -43,15 +43,15 @@ func NewPriorityQueue(size int, max_pq bool) *priority_queue {
 	return this
 }
 
-func (this *priority_queue) IsEmpty() bool {
+func (this *PriorityQueue) IsEmpty() bool {
 	return this.size == 0
 }
 
-func (this *priority_queue) Size() int {
+func (this *PriorityQueue) Size() int {
 	return this.size
 }
 
-func (this *priority_queue) Push(v interface{}) {
+func (this *PriorityQueue) Push(v interface{}) {
 	if pqi, ok := v.(*PriorityQueueItem); ok {
 		if this.Contains(pqi.Index) {
 			panic("index is already in the priority queue\n")
@@ -69,7 +69,7 @@ func (this *priority_queue) Push(v interface{}) {
 	}
 }
 
-func (this *priority_queue) Pop() *Item {
+func (this *PriorityQueue) Pop() *Item {
 	if this.size == 0 {
 		panic("Priority queue underflow\n")
 	}
@@ -91,11 +91,11 @@ func (this *priority_queue) Pop() *Item {
 	return item
 }
 
-func (this *priority_queue) Contains(i int) bool {
+func (this *PriorityQueue) Contains(i int) bool {
 	return this.qp[i] != -1
 }
 
-func (this *priority_queue) ChangeKey(i int, key algorithms.Comparable) {
+func (this *PriorityQueue) ChangeKey(i int, key algorithms.Comparable) {
 	if !this.Contains(i) {
 		panic("index is not in the priority queue\n")
 	}
@@ -104,7 +104,7 @@ func (this *priority_queue) ChangeKey(i int, key algorithms.Comparable) {
 	this.sink(this.qp[i])
 }
 
-func (this *priority_queue) IncreaseKey(i int, key algorithms.Comparable) {
+func (this *PriorityQueue) IncreaseKey(i int, key algorithms.Comparable) {
 	if !this.Contains(i) {
 		panic("index is not in the priority queue\n")
 	}
@@ -116,7 +116,7 @@ func (this *priority_queue) IncreaseKey(i int, key algorithms.Comparable) {
 	this.swim(this.qp[i])
 }
 
-func (this *priority_queue) DecreaseKey(i int, key algorithms.Comparable) {
+func (this *PriorityQueue) DecreaseKey(i int, key algorithms.Comparable) {
 	if !this.Contains(i) {
 		panic("index is not in the priority queue\n")
 	}
@@ -128,16 +128,16 @@ func (this *priority_queue) DecreaseKey(i int, key algorithms.Comparable) {
 	this.sink(this.qp[i])
 }
 
-func (this *priority_queue) Iterator() Iterator {
+func (this *PriorityQueue) Iterator() Iterator {
 	this.current = 1
 	return this
 }
 
-func (this *priority_queue) HasNext() bool {
+func (this *PriorityQueue) HasNext() bool {
 	return this.current != this.size+1
 }
 
-func (this *priority_queue) Next() *Item {
+func (this *PriorityQueue) Next() *Item {
 	item := &Item{}
 	item.Next = nil
 	item.Value = &PriorityQueueItem{this.pq[this.current], this.keys[this.pq[this.current]]}
@@ -145,7 +145,7 @@ func (this *priority_queue) Next() *Item {
 	return item
 }
 
-func (this *priority_queue) comp(i, j int) bool {
+func (this *PriorityQueue) comp(i, j int) bool {
 	if this.max_pq {
 		return this.keys[this.pq[i]].CompareTo(this.keys[this.pq[j]]) < 0
 	} else {
@@ -153,7 +153,7 @@ func (this *priority_queue) comp(i, j int) bool {
 	}
 }
 
-func (this *priority_queue) swap(i, j int) {
+func (this *PriorityQueue) swap(i, j int) {
 	t := this.pq[i]
 	this.pq[i] = this.pq[j]
 	this.pq[j] = t
@@ -162,14 +162,14 @@ func (this *priority_queue) swap(i, j int) {
 	this.qp[this.pq[j]] = j
 }
 
-func (this *priority_queue) swim(k int) {
+func (this *PriorityQueue) swim(k int) {
 	for k > 1 && this.comp(k/2, k) {
 		this.swap(k/2, k)
 		k = k / 2
 	}
 }
 
-func (this *priority_queue) sink(k int) {
+func (this *PriorityQueue) sink(k int) {
 	for 2*k <= this.size {
 		j := 2 * k
 		if j < this.size && this.comp(j, j+1) {

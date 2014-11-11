@@ -16,7 +16,7 @@ type DFS struct {
 	s int
 }
 
-func NewDFS(G *graph, s int) *DFS {
+func NewDFS(G *Graph, s int) *DFS {
 	this := &DFS{}
 
 	this.marked = make([]bool, G.V())
@@ -24,7 +24,7 @@ func NewDFS(G *graph, s int) *DFS {
 	this.id = make([]int, G.V())
 	this.s = s
 
-	this.digraph = G.IsDigraph()
+	this.digraph = G.GraphType() != UNIGRAPH
 	this.count = 0
 
 	if this.digraph {
@@ -53,7 +53,7 @@ func NewDFS(G *graph, s int) *DFS {
 	return this
 }
 
-func (this *DFS) explore(G *graph, v int, cc bool) {
+func (this *DFS) explore(G *Graph, v int, cc bool) {
 	if cc {
 		this.id[v] = this.count
 	}

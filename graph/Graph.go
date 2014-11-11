@@ -1,38 +1,44 @@
 package graph
 
 import (
+	"algorithms"
 	"algorithms/container"
 	"bufio"
+	"fmt"
 	"io"
 	"strconv"
 )
 
-type graph struct {
-	digraph bool
-	v       int
-	e       int
-	adj     []*container.Bag
+type GraphType int
+
+const (
+	UNIGRAPH  GraphType = 0
+	DIGRAPH   GraphType = 1
+	EWDIGRAPH GraphType = 2
+)
+
+type Graph struct {
+	gt  GraphType
+	v   int
+	e   int
+	adj []*container.Bag
 }
 
-func NewUnigraph(v int) *graph {
-	return NewGraph(v, false)
+func NewUnigraph(v int) *Graph {
+	return NewGraph(v, UNIGRAPH)
 }
 
-func NewDigraph(v int) *graph {
-	return NewGraph(v, true)
+func NewDigraph(v int) *Graph {
+	return NewGraph(v, DIGRAPH)
 }
 
-func NewUnigraphFromReader(r io.Reader) *graph {
-	return NewGraphFromReader(r, false)
+func NewEWDigraph(v int) *Graph {
+	return NewGraph(v, EWDIGRAPH)
 }
 
-func NewDigraphFromReader(r io.Reader) *graph {
-	return NewGraphFromReader(r, true)
-}
-
-func NewGraph(v int, digraph bool) *graph {
-	this := &graph{}
-	this.digraph = digraph
+func NewGraph(v int, gt GraphType) *Graph {
+	this := &Graph{}
+	this.gt = gt
 	this.v = v
 	this.e = 0
 	this.adj = make([]*container.Bag, v)
@@ -42,74 +48,103 @@ func NewGraph(v int, digraph bool) *graph {
 	return this
 }
 
-func NewGraphFromReader(r io.Reader, digraph bool) *graph {
+func NewUnigraphFromReader(r io.Reader) *Graph {
+	return NewGraphFromReader(r, UNIGRAPH)
+}
+
+func NewDigraphFromReader(r io.Reader) *Graph {
+	return NewGraphFromReader(r, DIGRAPH)
+}
+
+func NewEWDigraphFromReader(r io.Reader) *Graph {
+	return NewGraphFromReader(r, EWDIGRAPH)
+}
+
+func NewGraphFromReader(r io.Reader, gt GraphType) *Graph {
 	var v, e, w int
 	var err error
-	var this *graph
+	var this *Graph
 
 	scanner := bufio.NewScanner(r)
 	scanner.Split(bufio.ScanWords)
 
 	scanner.Scan()
 	if v, err = strconv.Atoi(scanner.Text()); err != nil {
+		fmt.Printf(err.Error())
 		return nil
 	}
 
-	if digraph {
+	switch gt {
+	case DIGRAPH:
 		this = NewDigraph(v)
-	} else {
+	case EWDIGRAPH:
+		this = NewEWDigraph(v)
+	default:
 		this = NewUnigraph(v)
 	}
 
 	scanner.Scan()
 	if e, err = strconv.Atoi(scanner.Text()); err != nil {
+		fmt.Printf(err.Error())
 		return nil
 	}
 
 	for i := 0; i < e; i++ {
 		scanner.Scan()
 		if v, err = strconv.Atoi(scanner.Text()); err != nil {
+			fmt.Printf(err.Error())
 			return nil
 		}
 		scanner.Scan()
 		if w, err = strconv.Atoi(scanner.Text()); err != nil {
+			fmt.Printf(err.Error())
 			return nil
 		}
-		this.AddEdge(v, w)
+		if gt == EWDIGRAPH {
+			var weight float64
+			scanner.Scan()
+			if weight, err = strconv.ParseFloat(scanner.Text(), 64); err != nil {
+				fmt.Printf(err.Error())
+				return nil
+			}
+			this.AddWeightedEdge(v, w, algorithms.Double(weight))
+		} else {
+			this.AddEdge(v, w)
+		}
 	}
 	return this
 }
 
-func (this *graph) V() int {
+func (this *Graph) V() int {
 	return this.v
 }
 
-func (this *graph) E() int {
+func (this *Graph) E() int {
 	return this.e
 }
 
-func (this *graph) AddEdge(v, w int) {
+func (this *Graph) AddEdge(v, w int) {
 	this.adj[v].Push(NewEdge(v, w))
-	if !this.digraph {
+	if this.gt == UNIGRAPH {
 		this.adj[w].Push(NewEdge(w, v))
 	}
 	this.e++
 }
 
-func (this *graph) AddWeightedEdge(v, w int, weight float64) {
+func (this *Graph) AddWeightedEdge(v, w int, weight algorithms.Double) {
 	this.adj[v].Push(NewWeightedEdge(v, w, weight))
-	if !this.digraph {
+	if this.gt == UNIGRAPH {
 		this.adj[w].Push(NewWeightedEdge(w, v, weight))
 	}
 	this.e++
 }
 
-func (this *graph) IsDigraph() bool {
-	return this.digraph
+func (this *Graph) GraphType() GraphType {
+	return this.gt
 }
 
-func (this *graph) Reverse() *graph {
-	if this.digraph {
+func (this *Graph) Reverse() *Graph {
+	if this.gt != UNIGRAPH {
 		R := NewDigraph(this.v)
 		for v := 0; v < this.v; v++ {
 			iter := this.Adj(v).Iterator()
@@ -124,11 +159,11 @@ func (this *graph) Reverse() *graph {
 	}
 }
 
-func (this *graph) Adj(v int) container.Iterable {
+func (this *Graph) Adj(v int) container.Iterable {
 	return this.adj[v]
 }
 
-func (this *graph) Degree(v int) int {
+func (this *Graph) Degree(v int) int {
 	degree := 0
 	iter := this.adj[v].Iterator()
 	for iter.HasNext() {
@@ -138,7 +173,7 @@ func (this *graph) Degree(v int) int {
 	return degree
 }
 
-func (this *graph) MaxDegree() int {
+func (this *Graph) MaxDegree() int {
 	max := 0
 	for v := 0; v < this.v; v++ {
 		degree := this.Degree(v)
@@ -149,11 +184,11 @@ func (this *graph) MaxDegree() int {
 	return max
 }
 
-func (this *graph) AvgDegree() int {
+func (this *Graph) AvgDegree() int {
 	return 2 * this.e / this.v
 }
 
-func (this *graph) NumberOfSelfLoops() int {
+func (this *Graph) NumberOfSelfLoops() int {
 	count := 0
 	for v := 0; v < this.v; v++ {
 		iter := this.adj[v].Iterator()
@@ -167,7 +202,7 @@ func (this *graph) NumberOfSelfLoops() int {
 	return count / 2
 }
 
-func (this *graph) String() string {
+func (this *Graph) String() string {
 	var s string
 	s = strconv.Itoa(this.v) + " vertices, " + strconv.Itoa(this.e) + " edges\n"
 	for v := 0; v < this.v; v++ {

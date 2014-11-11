@@ -1,9 +1,12 @@
 package graph
 
-import "fmt"
+import (
+	"algorithms"
+	"fmt"
+)
 
 type Edge interface {
-	Weight() float64
+	Weight() algorithms.Double
 	From() int
 	To() int
 	String() string
@@ -12,18 +15,18 @@ type Edge interface {
 type edge struct {
 	v      int
 	w      int
-	weight float64
+	weight algorithms.Double
 }
 
 func NewEdge(v, w int) Edge {
 	return &edge{v: v, w: w, weight: 1.0}
 }
 
-func NewWeightedEdge(v, w int, weight float64) Edge {
+func NewWeightedEdge(v, w int, weight algorithms.Double) Edge {
 	return &edge{v: v, w: w, weight: weight}
 }
 
-func (this *edge) Weight() float64 {
+func (this *edge) Weight() algorithms.Double {
 	return this.weight
 }
 

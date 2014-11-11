@@ -13,7 +13,7 @@ func TestTopological(t *testing.T) {
 	}
 	defer fd.Close()
 
-	sg := NewSymbolGraph(fd, true, "/")
+	sg := NewSymbolGraph(fd, DIGRAPH, "/")
 	G := sg.G()
 
 	cycleFinder := NewCycle(G)

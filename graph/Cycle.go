@@ -13,7 +13,7 @@ type Cycle struct {
 	onStack []bool
 }
 
-func NewCycle(G *graph) *Cycle {
+func NewCycle(G *Graph) *Cycle {
 	this := &Cycle{}
 
 	this.hasCycle = false
@@ -21,7 +21,7 @@ func NewCycle(G *graph) *Cycle {
 	this.marked = make([]bool, G.V())
 	this.edgeTo = make([]int, G.V())
 
-	if G.IsDigraph() {
+	if G.GraphType() != UNIGRAPH {
 		this.onStack = make([]bool, G.V())
 	}
 
@@ -34,8 +34,8 @@ func NewCycle(G *graph) *Cycle {
 	return this
 }
 
-func (this *Cycle) explore(G *graph, v, u int) {
-	if G.IsDigraph() {
+func (this *Cycle) explore(G *Graph, v, u int) {
+	if G.GraphType() != UNIGRAPH {
 		this.onStack[v] = true
 	}
 	this.marked[v] = true
@@ -48,7 +48,7 @@ func (this *Cycle) explore(G *graph, v, u int) {
 			this.edgeTo[w] = v
 			this.explore(G, w, v)
 		} else {
-			if G.IsDigraph() {
+			if G.GraphType() != UNIGRAPH {
 				if this.onStack[w] {
 					this.hasCycle = true
 				}
@@ -67,7 +67,7 @@ func (this *Cycle) explore(G *graph, v, u int) {
 			}
 		}
 	}
-	if G.IsDigraph() {
+	if G.GraphType() != UNIGRAPH {
 		this.onStack[v] = false
 	}
 	return

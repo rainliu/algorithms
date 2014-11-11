@@ -11,7 +11,7 @@ type BFS struct {
 	s      int
 }
 
-func NewBFS(G *graph, s int) *BFS {
+func NewBFS(G *Graph, s int) *BFS {
 	this := &BFS{}
 
 	this.marked = make([]bool, G.V())
@@ -23,7 +23,7 @@ func NewBFS(G *graph, s int) *BFS {
 	return this
 }
 
-func (this *BFS) explore(G *graph, s int) {
+func (this *BFS) explore(G *Graph, s int) {
 	this.marked[s] = true
 
 	queue := &container.Queue{}

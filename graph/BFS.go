@@ -11,7 +11,7 @@ type BFS struct {
 	s      int
 }
 
-func NewBFS(G *Graph, s int) *BFS {
+func NewBFS(G *graph, s int) *BFS {
 	this := &BFS{}
 
 	this.marked = make([]bool, G.V())
@@ -23,7 +23,7 @@ func NewBFS(G *Graph, s int) *BFS {
 	return this
 }
 
-func (this *BFS) explore(G *Graph, s int) {
+func (this *BFS) explore(G *graph, s int) {
 	this.marked[s] = true
 
 	queue := &container.Queue{}
@@ -32,7 +32,7 @@ func (this *BFS) explore(G *Graph, s int) {
 		v := queue.Pop().Value.(int)
 		iter := G.Adj(v).Iterator()
 		for iter.HasNext() {
-			w := iter.Next().Value.(int)
+			w := iter.Next().Value.(Edge).To()
 			if !this.marked[w] {
 				this.edgeTo[w] = v
 				this.marked[w] = true

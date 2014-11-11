@@ -1,7 +1,5 @@
 package graph
 
-import ()
-
 import (
 	"fmt"
 	"os"

@@ -13,7 +13,7 @@ type Cycle struct {
 	onStack []bool
 }
 
-func NewCycle(G *Graph) *Cycle {
+func NewCycle(G *graph) *Cycle {
 	this := &Cycle{}
 
 	this.hasCycle = false
@@ -34,14 +34,14 @@ func NewCycle(G *Graph) *Cycle {
 	return this
 }
 
-func (this *Cycle) explore(G *Graph, v, u int) {
+func (this *Cycle) explore(G *graph, v, u int) {
 	if G.IsDigraph() {
 		this.onStack[v] = true
 	}
 	this.marked[v] = true
 	iter := G.Adj(v).Iterator()
 	for iter.HasNext() {
-		w := iter.Next().Value.(int)
+		w := iter.Next().Value.(Edge).To()
 		if this.HasCycle() {
 			return
 		} else if !this.marked[w] {

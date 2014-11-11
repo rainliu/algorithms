@@ -7,7 +7,7 @@ import (
 )
 
 type SymbolGraph struct {
-	g    *Graph
+	g    *graph
 	keys []string
 	st   map[string]int
 }
@@ -62,6 +62,6 @@ func (this *SymbolGraph) Name(v int) string {
 	return this.keys[v]
 }
 
-func (this *SymbolGraph) G() *Graph {
+func (this *SymbolGraph) G() *graph {
 	return this.g
 }

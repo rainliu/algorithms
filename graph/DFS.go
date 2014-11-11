@@ -16,7 +16,7 @@ type DFS struct {
 	s int
 }
 
-func NewDFS(G *Graph, s int) *DFS {
+func NewDFS(G *graph, s int) *DFS {
 	this := &DFS{}
 
 	this.marked = make([]bool, G.V())
@@ -53,7 +53,7 @@ func NewDFS(G *Graph, s int) *DFS {
 	return this
 }
 
-func (this *DFS) explore(G *Graph, v int, cc bool) {
+func (this *DFS) explore(G *graph, v int, cc bool) {
 	if cc {
 		this.id[v] = this.count
 	}
@@ -61,7 +61,7 @@ func (this *DFS) explore(G *Graph, v int, cc bool) {
 
 	iter := G.Adj(v).Iterator()
 	for iter.HasNext() {
-		w := iter.Next().Value.(int)
+		w := iter.Next().Value.(Edge).To()
 		if !this.marked[w] {
 			if !cc {
 				this.edgeTo[w] = v

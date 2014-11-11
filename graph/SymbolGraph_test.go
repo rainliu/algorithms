@@ -1,7 +1,5 @@
 package graph
 
-import ()
-
 import (
 	"bufio"
 	"fmt"
@@ -37,7 +35,7 @@ func CallSymbolGraph(filename, command, delim string) {
 		fmt.Printf("%s\n", source)
 		iter := g.Adj(sg.Index(source)).Iterator()
 		for iter.HasNext() {
-			w := iter.Next().Value.(int)
+			w := iter.Next().Value.(Edge).To()
 			fmt.Printf("   %s\n", sg.Name(w))
 		}
 	}

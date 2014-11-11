@@ -7,31 +7,31 @@ import (
 	"strconv"
 )
 
-type Graph struct {
+type graph struct {
 	digraph bool
 	v       int
 	e       int
 	adj     []*container.Bag
 }
 
-func NewUnigraph(v int) *Graph {
+func NewUnigraph(v int) *graph {
 	return NewGraph(v, false)
 }
 
-func NewDigraph(v int) *Graph {
+func NewDigraph(v int) *graph {
 	return NewGraph(v, true)
 }
 
-func NewUnigraphFromReader(r io.Reader) *Graph {
+func NewUnigraphFromReader(r io.Reader) *graph {
 	return NewGraphFromReader(r, false)
 }
 
-func NewDigraphFromReader(r io.Reader) *Graph {
+func NewDigraphFromReader(r io.Reader) *graph {
 	return NewGraphFromReader(r, true)
 }
 
-func NewGraph(v int, digraph bool) *Graph {
-	this := &Graph{}
+func NewGraph(v int, digraph bool) *graph {
+	this := &graph{}
 	this.digraph = digraph
 	this.v = v
 	this.e = 0
@@ -42,10 +42,10 @@ func NewGraph(v int, digraph bool) *Graph {
 	return this
 }
 
-func NewGraphFromReader(r io.Reader, digraph bool) *Graph {
+func NewGraphFromReader(r io.Reader, digraph bool) *graph {
 	var v, e, w int
 	var err error
-	var this *Graph
+	var this *graph
 
 	scanner := bufio.NewScanner(r)
 	scanner.Split(bufio.ScanWords)
@@ -80,33 +80,41 @@ func NewGraphFromReader(r io.Reader, digraph bool) *Graph {
 	return this
 }
 
-func (this *Graph) V() int {
+func (this *graph) V() int {
 	return this.v
 }
 
-func (this *Graph) E() int {
+func (this *graph) E() int {
 	return this.e
 }
 
-func (this *Graph) AddEdge(v, w int) {
-	this.adj[v].Push(w)
+func (this *graph) AddEdge(v, w int) {
+	this.adj[v].Push(NewEdge(v, w))
 	if !this.digraph {
-		this.adj[w].Push(v)
+		this.adj[w].Push(NewEdge(w, v))
 	}
 	this.e++
 }
 
-func (this *Graph) IsDigraph() bool {
+func (this *graph) AddWeightedEdge(v, w int, weight float64) {
+	this.adj[v].Push(NewWeightedEdge(v, w, weight))
+	if !this.digraph {
+		this.adj[w].Push(NewWeightedEdge(w, v, weight))
+	}
+	this.e++
+}
+
+func (this *graph) IsDigraph() bool {
 	return this.digraph
 }
 
-func (this *Graph) Reverse() *Graph {
+func (this *graph) Reverse() *graph {
 	if this.digraph {
 		R := NewDigraph(this.v)
 		for v := 0; v < this.v; v++ {
 			iter := this.Adj(v).Iterator()
 			for iter.HasNext() {
-				w := iter.Next().Value.(int)
+				w := iter.Next().Value.(Edge).To()
 				R.AddEdge(w, v)
 			}
 		}
@@ -116,11 +124,11 @@ func (this *Graph) Reverse() *Graph {
 	}
 }
 
-func (this *Graph) Adj(v int) container.Iterable {
+func (this *graph) Adj(v int) container.Iterable {
 	return this.adj[v]
 }
 
-func (this *Graph) Degree(v int) int {
+func (this *graph) Degree(v int) int {
 	degree := 0
 	iter := this.adj[v].Iterator()
 	for iter.HasNext() {
@@ -130,7 +138,7 @@ func (this *Graph) Degree(v int) int {
 	return degree
 }
 
-func (this *Graph) MaxDegree() int {
+func (this *graph) MaxDegree() int {
 	max := 0
 	for v := 0; v < this.v; v++ {
 		degree := this.Degree(v)
@@ -141,17 +149,16 @@ func (this *Graph) MaxDegree() int {
 	return max
 }
 
-func (this *Graph) AvgDegree() int {
+func (this *graph) AvgDegree() int {
 	return 2 * this.e / this.v
 }
 
-func (this *Graph) NumberOfSelfLoops() int {
+func (this *graph) NumberOfSelfLoops() int {
 	count := 0
 	for v := 0; v < this.v; v++ {
 		iter := this.adj[v].Iterator()
 		for iter.HasNext() {
-			item := iter.Next()
-			w := item.Value.(int)
+			w := iter.Next().Value.(Edge).To()
 			if v == w {
 				count++
 			}
@@ -160,15 +167,14 @@ func (this *Graph) NumberOfSelfLoops() int {
 	return count / 2
 }
 
-func (this *Graph) String() string {
+func (this *graph) String() string {
 	var s string
 	s = strconv.Itoa(this.v) + " vertices, " + strconv.Itoa(this.e) + " edges\n"
 	for v := 0; v < this.v; v++ {
 		s += strconv.Itoa(v) + ": "
 		iter := this.adj[v].Iterator()
 		for iter.HasNext() {
-			item := iter.Next()
-			w := item.Value.(int)
+			w := iter.Next().Value.(Edge).To()
 			s += strconv.Itoa(w) + " "
 		}
 		s += "\n"

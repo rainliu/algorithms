@@ -12,7 +12,7 @@ type DFO struct {
 	reversePost *container.Stack
 }
 
-func NewDFO(G *Graph) *DFO {
+func NewDFO(G *graph) *DFO {
 	this := &DFO{}
 
 	this.pre = &container.Queue{}
@@ -29,13 +29,13 @@ func NewDFO(G *Graph) *DFO {
 	return this
 }
 
-func (this *DFO) explore(G *Graph, v int) {
+func (this *DFO) explore(G *graph, v int) {
 	this.marked[v] = true
 
 	this.previsit(v)
 	iter := G.Adj(v).Iterator()
 	for iter.HasNext() {
-		w := iter.Next().Value.(int)
+		w := iter.Next().Value.(Edge).To()
 		if !this.marked[w] {
 			this.explore(G, w)
 		}

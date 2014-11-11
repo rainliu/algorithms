@@ -10,6 +10,7 @@ type Dijkstra struct {
 	edgeTo []Edge
 	distTo []algorithms.Double
 	pq     *container.PriorityQueue
+	cycle  bool
 }
 
 func NewDijkstra(g *Graph, s int) *Dijkstra {
@@ -17,18 +18,28 @@ func NewDijkstra(g *Graph, s int) *Dijkstra {
 
 	this.edgeTo = make([]Edge, g.V())
 	this.distTo = make([]algorithms.Double, g.V())
-	this.pq = container.NewMinPriorityQueue(g.V())
 
 	for v := 0; v < g.V(); v++ {
-		this.distTo[v] = algorithms.Double(math.MaxFloat64)
+		this.distTo[v] = algorithms.Double(math.Inf(1))
 	}
 	this.distTo[s] = 0.0
 
-	this.pq.Push(&container.PriorityQueueItem{s, algorithms.Double(0.0)})
+	if NewCycle(g).HasCycle() {
+		this.cycle = true
+		this.pq = container.NewMinPriorityQueue(g.V())
+		this.pq.Push(&container.PriorityQueueItem{s, algorithms.Double(0.0)})
 
-	for !this.pq.IsEmpty() {
-		pqi := this.pq.Pop().Value.(*container.PriorityQueueItem)
-		this.relax(g, pqi.Index)
+		for !this.pq.IsEmpty() {
+			pqi := this.pq.Pop().Value.(*container.PriorityQueueItem)
+			this.relax(g, pqi.Index)
+		}
+	} else {
+		this.cycle = false
+		iter := NewDFO(g).ReversePost().Iterator()
+		for iter.HasNext() {
+			v := iter.Next().Value.(int)
+			this.relax(g, v)
+		}
 	}
 
 	return this
@@ -42,10 +53,13 @@ func (this *Dijkstra) relax(g *Graph, v int) {
 		if this.distTo[w] > this.distTo[v]+e.Weight() {
 			this.distTo[w] = this.distTo[v] + e.Weight()
 			this.edgeTo[w] = e
-			if this.pq.Contains(w) {
-				this.pq.ChangeKey(w, this.distTo[w])
-			} else {
-				this.pq.Push(&container.PriorityQueueItem{w, this.distTo[w]})
+
+			if this.cycle {
+				if this.pq.Contains(w) {
+					this.pq.ChangeKey(w, this.distTo[w])
+				} else {
+					this.pq.Push(&container.PriorityQueueItem{w, this.distTo[w]})
+				}
 			}
 		}
 	}
@@ -56,7 +70,7 @@ func (this *Dijkstra) DistTo(v int) algorithms.Double {
 }
 
 func (this *Dijkstra) HasPathTo(v int) bool {
-	return this.distTo[v] < algorithms.Double(math.MaxFloat64)
+	return this.distTo[v] < algorithms.Double(math.Inf(1))
 }
 
 func (this *Dijkstra) PathTo(v int) container.Iterable {
